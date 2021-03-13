@@ -1,26 +1,26 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
-	helper "github.com/bolZer/goarc/v2/internal"
+	"github.com/bolZer/goarc/v2/internal"
 )
 
 func main() {
 	var guildWars2InstallationPath string
 	var arcDpsFileDestinationPath string
 
-	helper.OutputToConsoleWithWarningFormatting("Start searching for Guild Wars 2 Installation!")
+	fmt.Println("Start searching for Guild Wars 2 Installation!")
 
-	guildWars2InstallationPath, err := helper.SearchForGuildWarsInstallation()
+	guildWars2InstallationPath, err := internal.SearchForGuildWarsInstallation()
 
 	if err != nil {
-		helper.OutputToConsoleWithAlertFormatting("No installation of Guild Wars 2 found. Exit.")
+		fmt.Println("No installation of Guild Wars 2 found. Exit.")
 		return
 	}
 
-	helper.OutputToConsoleWithSuccessFormatting("Installation of Guild Wars 2 found!")
-	helper.OutputToConsoleWithWarningFormatting("Checking if ArcDPS exists")
+	fmt.Println("Installation of Guild Wars 2 found! Checking if ArcDPS exists.")
 
 	arcDpsFileDestinationPath = strings.Join([]string{
 		guildWars2InstallationPath,
@@ -28,37 +28,37 @@ func main() {
 		"d3d9.dll",
 	}, "\\")
 
-	doesArcDpsExist := helper.CheckIfArcDPSExists(arcDpsFileDestinationPath)
+	doesArcDpsExist := internal.CheckIfArcDPSExists(arcDpsFileDestinationPath)
 
 	if !doesArcDpsExist {
-		helper.OutputToConsoleWithWarningFormatting("ArcDPS does not exists.")
+		fmt.Println("ArcDPS does not exists.")
 	}
 
 	if doesArcDpsExist {
-		helper.OutputToConsoleWithWarningFormatting("ArcDPS exists. Checking if outdated")
+		fmt.Println("ArcDPS exists. Checking if it's outdated.")
 
-		isExistingArcDpsOutdated, err := helper.CheckIfArcDPSIsOutdated(arcDpsFileDestinationPath)
+		isExistingArcDpsOutdated, err := internal.CheckIfArcDPSIsOutdated(arcDpsFileDestinationPath)
 
 		if err != nil {
-			helper.OutputToConsoleWithAlertFormatting(err.Error())
+			fmt.Println(err.Error())
 			return
 		}
 
 		if !isExistingArcDpsOutdated {
-			helper.OutputToConsoleWithAlertFormatting("ArcDPS is not outdated. Exit.")
+			fmt.Println("ArcDPS is not outdated. Exit.")
 			return
 		}
-	
+
 	}
 
-	helper.OutputToConsoleWithWarningFormatting("Downloading ArcDPS")
+	fmt.Println("Downloading ArcDPS")
 
-	err = helper.DownloadArcDPStoDestinationPath(arcDpsFileDestinationPath)
+	err = internal.DownloadArcDPSToDestinationPath(arcDpsFileDestinationPath)
 
 	if err != nil {
-		helper.OutputToConsoleWithAlertFormatting(err.Error())
+		fmt.Println(err.Error())
 		return
 	}
 
-	helper.OutputToConsoleWithSuccessFormatting("Done! ArcDPS is ready to be used")
+	fmt.Println("Done! ArcDPS is ready to be used")
 }

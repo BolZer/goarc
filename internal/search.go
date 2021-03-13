@@ -3,12 +3,13 @@ package internal
 import (
 	"bufio"
 	"errors"
+	"log"
 	"os/exec"
 	"regexp"
 	"strings"
 )
 
-const GW2_EXECUTABLE_NAME = "Gw2-64.exe"
+const Gw2ExecutableName = "Gw2-64.exe"
 
 func SearchForGuildWarsInstallation() (string, error) {
 
@@ -23,8 +24,8 @@ func SearchForGuildWarsInstallation() (string, error) {
 	for _, disk := range disks {
 		result = searchForGuildWars2ExecutableOnDisk(disk)
 
-		if result != ""{
-			return strings.TrimSpace(strings.ReplaceAll(result, "\\" +  GW2_EXECUTABLE_NAME, "")), nil
+		if result != "" {
+			return strings.TrimSpace(strings.ReplaceAll(result, "\\"+Gw2ExecutableName, "")), nil
 		}
 	}
 
@@ -47,21 +48,29 @@ func listDiscOfOs() ([]string, error) {
 func searchForGuildWars2ExecutableOnDisk(disk string) string {
 	sanitizedDiskString := disk + "\\"
 
-	command := exec.Command("WHERE", "/R", sanitizedDiskString, GW2_EXECUTABLE_NAME)
+	command := exec.Command("WHERE", "/R", sanitizedDiskString, Gw2ExecutableName)
 
-    stdout, _ := command.StdoutPipe()
+	stdout, _ := command.StdoutPipe()
 
-    command.Start()
+	err := command.Start()
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	scanner := bufio.NewScanner(stdout)
 
-    scanner.Split(bufio.ScanLines)
+	scanner.Split(bufio.ScanLines)
 
-    for scanner.Scan() {
-        return scanner.Text()
-    }
+	for scanner.Scan() {
+		return scanner.Text()
+	}
 
-	command.Wait()
+	err = command.Wait()
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return ""
 }

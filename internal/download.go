@@ -2,20 +2,27 @@ package internal
 
 import (
 	"io"
+	"log"
 	"net/http"
 	"os"
 )
 
-const ARC_DPS_DOWNLOAD_LINK = "https://www.deltaconnected.com/arcdps/x64/d3d9.dll"
+const ArcDpsDownloadLink = "https://www.deltaconnected.com/arcdps/x64/d3d9.dll"
 
-func DownloadArcDPStoDestinationPath(path string) error {
-	resp, err := http.Get(ARC_DPS_DOWNLOAD_LINK)
+func DownloadArcDPSToDestinationPath(path string) error {
+	resp, err := http.Get(ArcDpsDownloadLink)
 
 	if err != nil {
 		return err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	out, err := os.Create(path)
 
@@ -23,7 +30,13 @@ func DownloadArcDPStoDestinationPath(path string) error {
 		return err
 	}
 
-	defer out.Close()
+	defer func() {
+		err := out.Close()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	_, err = io.Copy(out, resp.Body)
 
