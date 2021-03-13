@@ -9,7 +9,7 @@ import (
 
 const ArcDpsDownloadLink = "https://www.deltaconnected.com/arcdps/x64/d3d9.dll"
 
-func DownloadArcDPSToDestinationPath(path string) error {
+func DownloadRemoteArcDPSToDestinationPath(path string) error {
 	resp, err := http.Get(ArcDpsDownloadLink)
 
 	if err != nil {

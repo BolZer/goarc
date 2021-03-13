@@ -3,7 +3,7 @@ package internal
 import (
 	"bufio"
 	"errors"
-	"log"
+	"fmt"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -11,12 +11,11 @@ import (
 
 const Gw2ExecutableName = "Gw2-64.exe"
 
-func SearchForGuildWarsInstallation() (string, error) {
-
+func SearchForLocalGuildWarsInstallation() (string, error) {
 	disks, err := listDiscOfOs()
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error encountered while listing disks of os: %w", err)
 	}
 
 	result := ""
@@ -29,15 +28,14 @@ func SearchForGuildWarsInstallation() (string, error) {
 		}
 	}
 
-	return "", errors.New("Couldn't find Guild Wars 2 Installation")
+	return "", errors.New("couldn't find installation of guild wars 2")
 }
 
 func listDiscOfOs() ([]string, error) {
-
 	out, err := exec.Command("wmic", "logicaldisk", "get", "name").Output()
 
 	if err != nil {
-		return []string{}, err
+		return []string{}, fmt.Errorf("command for listing os disks failed: %w", err)
 	}
 
 	regex := regexp.MustCompile(`(?m)^.:`)
@@ -55,7 +53,7 @@ func searchForGuildWars2ExecutableOnDisk(disk string) string {
 	err := command.Start()
 
 	if err != nil {
-		log.Fatal(err)
+		return ""
 	}
 
 	scanner := bufio.NewScanner(stdout)
@@ -67,10 +65,6 @@ func searchForGuildWars2ExecutableOnDisk(disk string) string {
 	}
 
 	err = command.Wait()
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	return ""
 }

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func CheckIfArcDPSExists(path string) bool {
+func CheckIfLocalArcDPSExists(path string) bool {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return false
 	}
@@ -17,7 +17,7 @@ func CheckIfArcDPSExists(path string) bool {
 	return true
 }
 
-func CheckIfArcDPSIsOutdated(path string) (bool, error) {
+func CheckIfLocalArcDpsDiffersFromRemoteOne(path string) (bool, error) {
 	var remoteArcDpsMd5Checksum []byte
 	var destinationArcDpsMd5Checksum []byte
 

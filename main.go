@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/bolZer/goarc/v2/internal"
@@ -13,11 +14,10 @@ func main() {
 
 	fmt.Println("Start searching for Guild Wars 2 Installation!")
 
-	guildWars2InstallationPath, err := internal.SearchForGuildWarsInstallation()
+	guildWars2InstallationPath, err := internal.SearchForLocalGuildWarsInstallation()
 
 	if err != nil {
-		fmt.Println("No installation of Guild Wars 2 found. Exit.")
-		return
+		log.Fatal(err)
 	}
 
 	fmt.Println("Installation of Guild Wars 2 found! Checking if ArcDPS exists.")
@@ -28,7 +28,7 @@ func main() {
 		"d3d9.dll",
 	}, "\\")
 
-	doesArcDpsExist := internal.CheckIfArcDPSExists(arcDpsFileDestinationPath)
+	doesArcDpsExist := internal.CheckIfLocalArcDPSExists(arcDpsFileDestinationPath)
 
 	if !doesArcDpsExist {
 		fmt.Println("ArcDPS does not exists.")
@@ -37,27 +37,24 @@ func main() {
 	if doesArcDpsExist {
 		fmt.Println("ArcDPS exists. Checking if it's outdated.")
 
-		isExistingArcDpsOutdated, err := internal.CheckIfArcDPSIsOutdated(arcDpsFileDestinationPath)
+		isExistingArcDpsOutdated, err := internal.CheckIfLocalArcDpsDiffersFromRemoteOne(arcDpsFileDestinationPath)
 
 		if err != nil {
-			fmt.Println(err.Error())
-			return
+			log.Fatal(err)
 		}
 
 		if !isExistingArcDpsOutdated {
 			fmt.Println("ArcDPS is not outdated. Exit.")
 			return
 		}
-
 	}
 
 	fmt.Println("Downloading ArcDPS")
 
-	err = internal.DownloadArcDPSToDestinationPath(arcDpsFileDestinationPath)
+	err = internal.DownloadRemoteArcDPSToDestinationPath(arcDpsFileDestinationPath)
 
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		log.Fatal(err)
 	}
 
 	fmt.Println("Done! ArcDPS is ready to be used")
